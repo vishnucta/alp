@@ -1,0 +1,180 @@
+@AbapCatalog.sqlViewName: 'ZCDLVSHAPQRYV2'
+@AbapCatalog.compiler.compareFilter: true
+@AccessControl.authorizationCheck: #PRIVILEGED_ONLY
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@ObjectModel.usageType.dataClass: #MIXED
+@ObjectModel.usageType.serviceQuality: #D
+@ObjectModel.usageType.sizeCategory: #XL
+@VDM.viewType: #CONSUMPTION
+@Analytics.query:true
+@OData.publish: true
+@Metadata.allowExtensions: true
+@EndUserText.label: 'Query for Dlv Perf - Shipped as Planned'
+
+define view ZC_DelivItmPerfAnlytsRptV2
+
+  as select from ZI_DELIVITMPERFANLYTSCUBEV2
+
+{
+      @Consumption.semanticObject: 'OutboundDelivery'
+      @AnalyticsDetails.query.axis: #ROWS
+  key OutboundDelivery,
+  
+      @AnalyticsDetails.query.axis: #ROWS
+  key OutboundDeliveryItem,
+  
+      @UI.textArrangement: #TEXT_ONLY
+      PlannedGoodsIssueDate,
+
+      @UI.textArrangement: #TEXT_ONLY
+      AdjustedPlannedGoodsIssueDate,
+
+      @UI.textArrangement: #TEXT_ONLY
+      ActualGoodsMovementDate,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      DeliveryPriority,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      @EndUserText.label: 'GI Status'
+      GoodsMovementStatus,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      Plant,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      TransportationGroup,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      Warehouse,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      DeliveryDocumentType,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      ReceivingPlant,
+
+      @Consumption.semanticObject: 'Customer'
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      ShipToParty,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      ShippingCondition,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      ShippingPoint,
+
+      @Consumption.semanticObject: 'Customer'
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      SoldToParty,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      ProposedDeliveryRoute,
+
+      @UI.textArrangement: #TEXT_ONLY
+      @EndUserText.label: 'Year'
+      CalendarYear,
+
+      @UI.textArrangement: #TEXT_ONLY
+      @EndUserText.label: 'Quarter'
+      CalendarQuarter,
+
+      @UI.textArrangement: #TEXT_ONLY
+      @EndUserText.label: 'Month'
+      CalendarMonth,
+
+      @UI.textArrangement: #TEXT_ONLY
+      @EndUserText.label: 'Week'
+      CalendarWeek,
+
+      @UI.textArrangement: #TEXT_SEPARATE
+      @EndUserText.label: 'Month and Year'
+      YearMonth,
+
+      @UI.textArrangement: #TEXT_SEPARATE
+      @EndUserText.label: 'Quarter and Year'
+      YearQuarter,
+
+      @UI.textArrangement: #TEXT_SEPARATE
+      @EndUserText.label: 'Week and Year'
+      YearWeek,
+
+      @Consumption.semanticObject: 'Material'
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      Product,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      ProductGroup,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      @EndUserText.label: 'Customer Classification'
+      CustomerClassification,
+
+      @Consumption.semanticObject: 'Supplier'
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      @EndUserText.label: 'Forwarding Agent'
+      ForwardingAgent,
+
+      @UI.textArrangement: #TEXT_ONLY
+      ReferenceSDDocument,
+
+      @UI.textArrangement: #TEXT_ONLY
+      ReferenceSDDocumentItem,
+
+      @AnalyticsDetails.query.display: #KEY_TEXT
+      @EndUserText.label: 'Preceding Document Category'
+      ReferenceSDDocumentCategory,
+      @Consumption.hidden: true
+      HundredInPercent,
+
+      /* KPIs */
+      @UI.lineItem: [{ qualifier: 'Default', position: 40 }]
+      @UI.textArrangement: #TEXT_SEPARATE
+      NumberOfDeliveryItems,
+
+      @UI.textArrangement: #TEXT_SEPARATE
+      @EndUserText.label: 'Average GI Delay in Days'
+      @AnalyticsDetails.query.decimals: 2
+      @AnalyticsDetails.query.formula: 'NDIV0( $projection.GIToPlndGIDelayInDays / $projection.NumberOfDeliveryItems )'
+      cast(1 as avg_gi_to_plnd_gi_delay)        as AvgGIToPlndGIDelayInDays,
+
+      @UI.textArrangement: #TEXT_SEPARATE
+      GIToPlndGIDelayInDays,
+
+      @UI.textArrangement: #TEXT_SEPARATE
+      MaxGIToPlndGIDelayInDays,
+
+      @DefaultAggregation: #FORMULA
+      @AnalyticsDetails.query.decimals: 2
+      @AnalyticsDetails.query.formula: 'NDIV0( NODIM( $projection.NmbrOfShpdAsPlndDelivItems) / NODIM( $projection.NumberOfDeliveryItems) )*HundredInPercent'
+      cast(1 as dlv_itms_shipped_as_plnd_ratio) as DelivItemsShpdAsPlndRatio,
+
+      @UI.textArrangement: #TEXT_SEPARATE
+      @AnalyticsDetails.query.axis: #ROWS
+      NmbrOfShpdAsPlndDelivItems,
+
+      @EndUserText.label: 'Customer confirmed del date'
+      @UI.textArrangement: #TEXT_ONLY
+      Cust_conf_del_date,
+
+      @EndUserText.label: 'Adjusted Confirmed del date'
+      @UI.textArrangement: #TEXT_ONLY
+      Adj_conf_del_date,
+
+      @EndUserText.label: 'Requested del date'
+      @UI.textArrangement: #TEXT_ONLY
+      req_del_date,
+
+      @EndUserText.label: 'Adjusted Confirmed delay days'
+      @UI.textArrangement: #TEXT_SEPARATE
+      Adj_conf_delay_days,
+
+      @EndUserText.label: 'Customer confirmed delay days'
+      @UI.textArrangement: #TEXT_SEPARATE
+      cust_conf_delay_days,
+
+      @EndUserText.label: 'Requested delay days'
+      @UI.textArrangement: #TEXT_SEPARATE
+      requested_delay_days
+
+}
